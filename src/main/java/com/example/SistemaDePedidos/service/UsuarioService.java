@@ -3,7 +3,6 @@ package com.example.SistemaDePedidos.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.SistemaDePedidos.model.Cliente;
 import com.example.SistemaDePedidos.model.RolUsuario;
 import com.example.SistemaDePedidos.model.Usuario;
 import com.example.SistemaDePedidos.repository.UsuarioRepository;
@@ -26,11 +25,6 @@ public class UsuarioService {
 
     public Usuario obtenerUsuario(String idUsuario) {
         return usuarioRepository.findById(idUsuario).orElse(null);
-    }
-    
-    // ✅ AGREGAR ESTE MÉTODO
-    public Cliente obtenerCliente(String idUsuario) {
-        return usuarioRepository.findClienteById(idUsuario).orElse(null);
     }
 
     public Usuario actualizarUsuario(Usuario usuario) {

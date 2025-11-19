@@ -27,14 +27,24 @@ public class PedidoService {
     private ItemService itemService;
 
     public Pedido crearPedido(Pedido pedido) {
-     
+        // Lógica de inyección del Cliente
         if (pedido.getCliente() != null && pedido.getCliente().getIdUsuario() != null) {
             String idCliente = pedido.getCliente().getIdUsuario();
-            Cliente clienteCompleto = usuarioService.obtenerCliente(idCliente);  // ✅ CAMBIO AQUÍ
-            if (clienteCompleto != null) {
-                pedido.setCliente(clienteCompleto);
+            // Obtener el objeto como tipo base Usuario
+            com.example.SistemaDePedidos.model.Usuario usuarioBase = usuarioService.obtenerUsuario(idCliente);
+            
+            // 1. Verificar si existe
+            if (usuarioBase == null) {
+                throw new RuntimeException("Cliente (Usuario) no encontrado con ID: " + idCliente);
+            }
+            
+            // 2. Verificar si es del tipo correcto antes de asignar
+            if (usuarioBase instanceof Cliente) {
+                // El casting ahora es seguro
+                pedido.setCliente((Cliente) usuarioBase);
             } else {
-                throw new RuntimeException("Cliente con ID " + idCliente + " no encontrado");
+                // El ID existe, pero no es de la subclase esperada
+                throw new RuntimeException("El usuario con ID " + idCliente + " no es de tipo Cliente.");
             }
         }
         
@@ -44,13 +54,12 @@ public class PedidoService {
                 if (detalle.getItem() != null && detalle.getItem().getIdItem() != null) {
                     String idItem = detalle.getItem().getIdItem();
                     Item itemCompleto = itemService.obtenerItem(idItem);
-                    if (itemCompleto != null) {
-                        detalle.setItem(itemCompleto);
-                        detalle.setPrecioUnitario(itemCompleto.getPrecio());
-                        detalle.setSubtotal(itemCompleto.getPrecio() * detalle.getCantidad());
-                    } else {
-                        throw new RuntimeException("Item con ID " + idItem + " no encontrado");
+                    if (itemCompleto == null) {
+                        throw new RuntimeException("Item no encontrado con ID: " + idItem);
                     }
+                    detalle.setItem(itemCompleto);
+                    detalle.setPrecioUnitario(itemCompleto.getPrecio());
+                    detalle.setSubtotal(itemCompleto.getPrecio() * detalle.getCantidad());
                 }
             }
         }
