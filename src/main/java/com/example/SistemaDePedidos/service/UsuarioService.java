@@ -42,12 +42,11 @@ public class UsuarioService {
     }
 
     public Usuario autenticarUsuario(String gmail, String contraseña) {
-        if (validarCredenciales(gmail, contraseña)) {
-            return usuarioRepository.findByGmail(gmail)
-                                            .orElse(null);
-        }
-        return null;
+    if (validarCredenciales(gmail, contraseña)) {
+        return usuarioRepository.findByGmail(gmail).orElse(null);
     }
+    return null;
+}
 
     public void recuperarContraseña(String gmail) {
         Usuario usuario = usuarioRepository.findByGmail(gmail)
@@ -66,7 +65,8 @@ public class UsuarioService {
     }
 
     public boolean verificarEmailExiste(String gmail) {
-        return usuarioRepository.findByGmail(gmail) != null;
+        // Se usa isPresent() para verificar si el Optional contiene un usuario.
+        return usuarioRepository.findByGmail(gmail).isPresent();
     }
 
     public String encriptarContraseña(String contraseña) {
