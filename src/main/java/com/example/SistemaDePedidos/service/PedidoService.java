@@ -30,11 +30,22 @@ public class PedidoService {
         // Rellenar datos completos del Cliente
         if (pedido.getCliente() != null && pedido.getCliente().getIdUsuario() != null) {
             String idCliente = pedido.getCliente().getIdUsuario();
-            Cliente clienteCompleto = (Cliente) usuarioService.obtenerUsuario(idCliente);
-            if (clienteCompleto == null) {
-                throw new RuntimeException("Cliente no encontrado con ID: " + idCliente);
+            // Obtener el objeto como tipo base Usuario
+            com.example.SistemaDePedidos.model.Usuario usuarioBase = usuarioService.obtenerUsuario(idCliente);
+            
+            // 1. Verificar si existe
+            if (usuarioBase == null) {
+                throw new RuntimeException("Cliente (Usuario) no encontrado con ID: " + idCliente);
             }
-            pedido.setCliente(clienteCompleto);
+            
+            // 2. Verificar si es del tipo correcto (Cliente) antes de asignar
+            if (usuarioBase instanceof Cliente) {
+                // El casting ahora es seguro porque sabemos que la instancia real es un Cliente
+                pedido.setCliente((Cliente) usuarioBase);
+            } else {
+                // Lanza una excepción si el ID existe, pero no es de la subclase esperada
+                throw new RuntimeException("El usuario con ID " + idCliente + " no es de tipo Cliente.");
+            }
         }
         
         // Rellenar datos completos de los Items en los detalles
