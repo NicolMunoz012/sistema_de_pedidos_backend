@@ -3,6 +3,7 @@ package com.example.SistemaDePedidos.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.SistemaDePedidos.model.Cliente;
 import com.example.SistemaDePedidos.model.RolUsuario;
 import com.example.SistemaDePedidos.model.Usuario;
 import com.example.SistemaDePedidos.repository.UsuarioRepository;
@@ -13,18 +14,23 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
 
     public Usuario crearUsuario(Usuario usuario) {
-    if (!verificarEmailExiste(usuario.getGmail())) {
-        usuario.setContraseña(encriptarContraseña(usuario.getContraseña()));
-        if (usuario.getRol() == null) {
-            usuario.setRol(RolUsuario.CLIENTE);
+        if (!verificarEmailExiste(usuario.getGmail())) {
+            usuario.setContraseña(encriptarContraseña(usuario.getContraseña()));
+            if (usuario.getRol() == null) {
+                usuario.setRol(RolUsuario.CLIENTE);
+            }
+            return usuarioRepository.save(usuario);
         }
-        return usuarioRepository.save(usuario);
-}
-    throw new RuntimeException("El email " + usuario.getGmail() + " ya está registrado."); 
+        throw new RuntimeException("El email " + usuario.getGmail() + " ya está registrado."); 
     }
 
     public Usuario obtenerUsuario(String idUsuario) {
         return usuarioRepository.findById(idUsuario).orElse(null);
+    }
+    
+    // ✅ AGREGAR ESTE MÉTODO
+    public Cliente obtenerCliente(String idUsuario) {
+        return usuarioRepository.findClienteById(idUsuario).orElse(null);
     }
 
     public Usuario actualizarUsuario(Usuario usuario) {
@@ -36,21 +42,19 @@ public class UsuarioService {
     }
 
     public boolean validarCredenciales(String gmail, String contraseña) {
-        Usuario usuario = usuarioRepository.findByGmail(gmail)
-                                     .orElse(null);
+        Usuario usuario = usuarioRepository.findByGmail(gmail).orElse(null);
         return usuario != null && usuario.getContraseña().equals(encriptarContraseña(contraseña));
     }
 
     public Usuario autenticarUsuario(String gmail, String contraseña) {
-    if (validarCredenciales(gmail, contraseña)) {
-        return usuarioRepository.findByGmail(gmail).orElse(null);
+        if (validarCredenciales(gmail, contraseña)) {
+            return usuarioRepository.findByGmail(gmail).orElse(null);
+        }
+        return null;
     }
-    return null;
-}
 
     public void recuperarContraseña(String gmail) {
-        Usuario usuario = usuarioRepository.findByGmail(gmail)
-                                     .orElse(null);
+        Usuario usuario = usuarioRepository.findByGmail(gmail).orElse(null);
         if (usuario != null) {
             System.out.println("Enviando correo de recuperación a: " + gmail);
         }
@@ -65,7 +69,6 @@ public class UsuarioService {
     }
 
     public boolean verificarEmailExiste(String gmail) {
-        // Se usa isPresent() para verificar si el Optional contiene un usuario.
         return usuarioRepository.findByGmail(gmail).isPresent();
     }
 

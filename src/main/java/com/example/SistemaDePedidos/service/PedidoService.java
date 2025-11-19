@@ -27,12 +27,14 @@ public class PedidoService {
     private ItemService itemService;
 
     public Pedido crearPedido(Pedido pedido) {
-        // Rellenar datos completos del Cliente
+     
         if (pedido.getCliente() != null && pedido.getCliente().getIdUsuario() != null) {
             String idCliente = pedido.getCliente().getIdUsuario();
-            com.example.SistemaDePedidos.model.Usuario usuarioBase = usuarioService.obtenerUsuario(idCliente);
-            if (usuarioBase != null) {
-                pedido.setCliente((Cliente) usuarioBase);
+            Cliente clienteCompleto = usuarioService.obtenerCliente(idCliente);  // ✅ CAMBIO AQUÍ
+            if (clienteCompleto != null) {
+                pedido.setCliente(clienteCompleto);
+            } else {
+                throw new RuntimeException("Cliente con ID " + idCliente + " no encontrado");
             }
         }
         
@@ -44,9 +46,10 @@ public class PedidoService {
                     Item itemCompleto = itemService.obtenerItem(idItem);
                     if (itemCompleto != null) {
                         detalle.setItem(itemCompleto);
-                        // Calcular precio unitario y subtotal basado en el item completo
                         detalle.setPrecioUnitario(itemCompleto.getPrecio());
                         detalle.setSubtotal(itemCompleto.getPrecio() * detalle.getCantidad());
+                    } else {
+                        throw new RuntimeException("Item con ID " + idItem + " no encontrado");
                     }
                 }
             }
@@ -77,7 +80,7 @@ public class PedidoService {
 
     public List<Pedido> listarPedidosPorCliente(String idCliente) {
         return pedidoRepository.findAll().stream()
-                .filter(p -> p.getCliente().getIdUsuario().equals(idCliente))
+                .filter(p -> p.getCliente() != null && p.getCliente().getIdUsuario().equals(idCliente))
                 .collect(Collectors.toList());
     }
 
@@ -141,7 +144,7 @@ public class PedidoService {
     }
 
     public double calcularTotalPedido(Pedido pedido) {
-        if (pedido.getDetalles() == null) {
+        if (pedido == null || pedido.getDetalles() == null) {
             return 0.0;
         }
         return pedido.getDetalles().stream()
@@ -150,10 +153,12 @@ public class PedidoService {
     }
 
     public boolean validarItemsDisponibles(List<Item> items) {
-        return items.stream().allMatch(Item::isDisponibilidad);
+        return items != null && items.stream().allMatch(Item::isDisponibilidad);
     }
 
     public void notificarCambioEstado(Pedido pedido) {
-        notificacionService.enviarNotificacionCambioEstado(pedido, pedido.getEstado());
+        if (pedido != null) {
+            notificacionService.enviarNotificacionCambioEstado(pedido, pedido.getEstado());
+        }
     }
 }
