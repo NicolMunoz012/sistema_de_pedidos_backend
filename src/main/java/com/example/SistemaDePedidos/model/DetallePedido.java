@@ -1,7 +1,7 @@
 package com.example.SistemaDePedidos.model;
 
 public class DetallePedido {
-    private int idDetalle;
+    private String idDetalle;
     private Item item;
     private int cantidad;
     private double precioUnitario;
@@ -11,7 +11,7 @@ public class DetallePedido {
     public DetallePedido() {
     }
 
-    public DetallePedido(int idDetalle, Item item, int cantidad, double precioUnitario, double subtotal, String observaciones) {
+    public DetallePedido(String idDetalle, Item item, int cantidad, double precioUnitario, double subtotal, String observaciones) {
         this.idDetalle = idDetalle;
         this.item = item;
         this.cantidad = cantidad;
@@ -20,11 +20,11 @@ public class DetallePedido {
         this.observaciones = observaciones;
     }
 
-    public int getIdDetalle() {
+    public String getIdDetalle() {
         return idDetalle;
     }
 
-    public void setIdDetalle(int idDetalle) {
+    public void setIdDetalle(String idDetalle) {
         this.idDetalle = idDetalle;
     }
 

@@ -1,14 +1,17 @@
 package com.example.SistemaDePedidos.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "pedidos")
 public class Pedido {
     @Id
-    private int codigoPedido;
+    @Field("_id")
+    private String codigoPedido;
     private Cliente cliente;
     private Date fecha;
     private Estado estado;
@@ -17,7 +20,7 @@ public class Pedido {
     public Pedido() {
     }
 
-    public Pedido(int codigoPedido, Cliente cliente, Date fecha, Estado estado, List<DetallePedido> detalles) {
+    public Pedido(String codigoPedido, Cliente cliente, Date fecha, Estado estado, List<DetallePedido> detalles) {
         this.codigoPedido = codigoPedido;
         this.cliente = cliente;
         this.fecha = fecha;
@@ -25,11 +28,11 @@ public class Pedido {
         this.detalles = detalles;
     }
 
-    public int getCodigoPedido() {
+    public String getCodigoPedido() {
         return codigoPedido;
     }
 
-    public void setCodigoPedido(int codigoPedido) {
+    public void setCodigoPedido(String codigoPedido) {
         this.codigoPedido = codigoPedido;
     }
 

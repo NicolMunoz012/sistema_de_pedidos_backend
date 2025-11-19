@@ -29,7 +29,7 @@ public class PedidoController {
     }
 
     @GetMapping("/{codigoPedido}")
-    public Pedido obtenerPedido(@PathVariable int codigoPedido) {
+    public Pedido obtenerPedido(@PathVariable String codigoPedido) {
         return pedidoService.obtenerPedido(codigoPedido);
     }
 
@@ -49,28 +49,28 @@ public class PedidoController {
     }
 
     @PutMapping("/{codigoPedido}/estado")
-    public Pedido actualizarEstadoPedido(@PathVariable int codigoPedido, @RequestParam Estado nuevoEstado) {
+    public Pedido actualizarEstadoPedido(@PathVariable String codigoPedido, @RequestParam Estado nuevoEstado) {
         return pedidoService.cambiarEstadoPedido(codigoPedido, nuevoEstado);
     }
 
     @PostMapping("/{codigoPedido}/items")
-    public Pedido agregarItemAlPedido(@PathVariable int codigoPedido, @RequestBody Item item) {
+    public Pedido agregarItemAlPedido(@PathVariable String codigoPedido, @RequestBody Item item) {
         return pedidoService.agregarItemAlPedido(codigoPedido, item);
     }
 
     @DeleteMapping("/{codigoPedido}/items/{nombreItem}")
-    public Pedido eliminarItemDelPedido(@PathVariable int codigoPedido, @PathVariable String nombreItem) {
+    public Pedido eliminarItemDelPedido(@PathVariable String codigoPedido, @PathVariable String nombreItem) {
         return pedidoService.eliminarItemDelPedido(codigoPedido, nombreItem);
     }
 
     @GetMapping("/{codigoPedido}/total")
-    public double calcularTotalPedido(@PathVariable int codigoPedido) {
+    public double calcularTotalPedido(@PathVariable String codigoPedido) {
         Pedido pedido = pedidoService.obtenerPedido(codigoPedido);
         return pedido != null ? pedidoService.calcularTotalPedido(pedido) : 0.0;
     }
 
     @DeleteMapping("/{codigoPedido}/cancelar")
-    public void cancelarPedido(@PathVariable int codigoPedido) {
+    public void cancelarPedido(@PathVariable String codigoPedido) {
         pedidoService.cambiarEstadoPedido(codigoPedido, Estado.CANCELADO);
     }
 }

@@ -29,7 +29,7 @@ public class PedidoService {
         return nuevoPedido;
     }
 
-    public Pedido obtenerPedido(int codigoPedido) {
+    public Pedido obtenerPedido(String codigoPedido) {
         return pedidoRepository.findById(codigoPedido).orElse(null);
     }
 
@@ -37,7 +37,7 @@ public class PedidoService {
         return pedidoRepository.save(pedido);
     }
 
-    public void eliminarPedido(int codigoPedido) {
+    public void eliminarPedido(String codigoPedido) {
         pedidoRepository.deleteById(codigoPedido);
     }
 
@@ -57,7 +57,7 @@ public class PedidoService {
                 .collect(Collectors.toList());
     }
 
-    public Pedido cambiarEstadoPedido(int codigoPedido, Estado nuevoEstado) {
+    public Pedido cambiarEstadoPedido(String codigoPedido, Estado nuevoEstado) {
         Pedido pedido = obtenerPedido(codigoPedido);
         if (pedido != null) {
             pedido.setEstado(nuevoEstado);
@@ -68,7 +68,7 @@ public class PedidoService {
         return null;
     }
 
-    public Pedido agregarItemAlPedido(int codigoPedido, Item item) {
+    public Pedido agregarItemAlPedido(String codigoPedido, Item item) {
         Pedido pedido = obtenerPedido(codigoPedido);
         if (pedido != null && item.isDisponibilidad()) {
             DetallePedido detalle = new DetallePedido();
@@ -88,17 +88,20 @@ public class PedidoService {
         return null;
     }
     
-    private int generarIdDetalle(Pedido pedido) {
+    private String generarIdDetalle(Pedido pedido) {
         if (pedido.getDetalles() == null || pedido.getDetalles().isEmpty()) {
-            return 1;
+            return "1";
         }
-        return pedido.getDetalles().stream()
-                .mapToInt(DetallePedido::getIdDetalle)
+        int maxId = pedido.getDetalles().stream()
+                .map(DetallePedido::getIdDetalle)
+                .filter(id -> id != null && id.matches("\\d+"))
+                .mapToInt(Integer::parseInt)
                 .max()
-                .orElse(0) + 1;
+                .orElse(0);
+        return String.valueOf(maxId + 1);
     }
 
-    public Pedido eliminarItemDelPedido(int codigoPedido, String nombreItem) {
+    public Pedido eliminarItemDelPedido(String codigoPedido, String nombreItem) {
         Pedido pedido = obtenerPedido(codigoPedido);
         if (pedido != null && pedido.getDetalles() != null) {
             pedido.getDetalles().removeIf(d -> d.getItem().getNombre().equals(nombreItem));
