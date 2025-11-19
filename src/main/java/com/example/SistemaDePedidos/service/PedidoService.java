@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.SistemaDePedidos.model.Cliente;
 import com.example.SistemaDePedidos.model.DetallePedido;
 import com.example.SistemaDePedidos.model.Estado;
 import com.example.SistemaDePedidos.model.Item;
@@ -20,8 +21,37 @@ public class PedidoService {
     private PedidoRepository pedidoRepository;
     @Autowired
     private NotificacionService notificacionService;
+    @Autowired
+    private UsuarioService usuarioService;
+    @Autowired
+    private ItemService itemService;
 
     public Pedido crearPedido(Pedido pedido) {
+        // Rellenar datos completos del Cliente
+        if (pedido.getCliente() != null && pedido.getCliente().getIdUsuario() != null) {
+            String idCliente = pedido.getCliente().getIdUsuario();
+            Object clienteCompleto = usuarioService.obtenerUsuario(idCliente);
+            if (clienteCompleto instanceof com.example.SistemaDePedidos.model.Cliente) {
+                pedido.setCliente((com.example.SistemaDePedidos.model.Cliente) clienteCompleto);
+            }
+        }
+        
+        // Rellenar datos completos de los Items en los detalles
+        if (pedido.getDetalles() != null && !pedido.getDetalles().isEmpty()) {
+            for (DetallePedido detalle : pedido.getDetalles()) {
+                if (detalle.getItem() != null && detalle.getItem().getIdItem() != null) {
+                    String idItem = detalle.getItem().getIdItem();
+                    Item itemCompleto = itemService.obtenerItem(idItem);
+                    if (itemCompleto != null) {
+                        detalle.setItem(itemCompleto);
+                        // Calcular precio unitario y subtotal basado en el item completo
+                        detalle.setPrecioUnitario(itemCompleto.getPrecio());
+                        detalle.setSubtotal(itemCompleto.getPrecio() * detalle.getCantidad());
+                    }
+                }
+            }
+        }
+        
         pedido.setFecha(new Date());
         pedido.setEstado(Estado.PENDIENTE);
         Pedido nuevoPedido = pedidoRepository.save(pedido);
