@@ -1,8 +1,8 @@
-package com.restaurante.pedidos.model;
+package com.example.SistemaDePedidos.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.TypeAlias;
 
-@Document(collection = "clientes")
+@TypeAlias("cliente")
 public class Cliente extends Usuario {
     private String direccion;
 
@@ -10,7 +10,7 @@ public class Cliente extends Usuario {
     }
 
     public Cliente(String idUsuario, String nombre, String gmail, String contraseña, String direccion) {
-        super(idUsuario, nombre, gmail, contraseña);
+        super(idUsuario, nombre, gmail, contraseña, RolUsuario.CLIENTE);
         this.direccion = direccion;
     }
 

@@ -1,9 +1,9 @@
-package com.restaurante.pedidos.service;
+package com.example.SistemaDePedidos.service;
 
-import com.restaurante.pedidos.model.Cliente;
-import com.restaurante.pedidos.model.Estado;
-import com.restaurante.pedidos.model.Factura;
-import com.restaurante.pedidos.model.Pedido;
+import com.example.SistemaDePedidos.model.Cliente;
+import com.example.SistemaDePedidos.model.Estado;
+import com.example.SistemaDePedidos.model.Factura;
+import com.example.SistemaDePedidos.model.Pedido;
 import org.springframework.stereotype.Service;
 
 @Service

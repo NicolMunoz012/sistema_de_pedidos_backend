@@ -1,4 +1,4 @@
-package com.restaurante.pedidos.controller;
+package com.example.SistemaDePedidos.controller;
 
 import java.util.List;
 
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.restaurante.pedidos.model.Categoria;
-import com.restaurante.pedidos.model.Item;
-import com.restaurante.pedidos.service.ItemService;
+import com.example.SistemaDePedidos.model.Categoria;
+import com.example.SistemaDePedidos.model.Item;
+import com.example.SistemaDePedidos.service.ItemService;
 
 @RestController
 @RequestMapping("/api/items")

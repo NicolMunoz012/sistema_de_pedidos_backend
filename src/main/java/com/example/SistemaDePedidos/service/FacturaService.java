@@ -1,4 +1,4 @@
-package com.restaurante.pedidos.service;
+package com.example.SistemaDePedidos.service;
 
 import java.util.Date;
 import java.util.List;
@@ -7,10 +7,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.restaurante.pedidos.model.Factura;
-import com.restaurante.pedidos.model.Pedido;
-import com.restaurante.pedidos.repository.FacturaRepository;
-import com.restaurante.pedidos.repository.PedidoRepository;
+import com.example.SistemaDePedidos.model.Factura;
+import com.example.SistemaDePedidos.model.Pedido;
+import com.example.SistemaDePedidos.repository.FacturaRepository;
+import com.example.SistemaDePedidos.repository.PedidoRepository;
 
 @Service
 public class FacturaService {

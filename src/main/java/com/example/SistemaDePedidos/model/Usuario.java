@@ -1,24 +1,28 @@
-package com.restaurante.pedidos.model;
+package com.example.SistemaDePedidos.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.annotation.TypeAlias;
 
 @Document(collection = "usuarios")
+@TypeAlias("usuario")
 public class Usuario {
     @Id
     private String idUsuario;
     private String nombre;
     private String gmail;
     private String contraseña;
+    private RolUsuario rol;
 
     public Usuario() {
     }
 
-    public Usuario(String idUsuario, String nombre, String gmail, String contraseña) {
+    public Usuario(String idUsuario, String nombre, String gmail, String contraseña, RolUsuario rol) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.gmail = gmail;
         this.contraseña = contraseña;
+        this.rol = rol;
     }
 
     public String getIdUsuario() {
@@ -53,6 +57,14 @@ public class Usuario {
         this.contraseña = contraseña;
     }
 
+    public RolUsuario getRol() {
+        return rol;
+    }
+
+    public void setRol(RolUsuario rol) {
+        this.rol = rol;
+    }
+
     @Override
     public String toString() {
         return "Usuario{" +
@@ -60,6 +72,7 @@ public class Usuario {
                 ", nombre='" + nombre + '\'' +
                 ", gmail='" + gmail + '\'' +
                 ", contraseña='" + contraseña + '\'' +
+                ", rol=" + rol +
                 '}';
     }
 }

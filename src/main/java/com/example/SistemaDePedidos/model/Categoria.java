@@ -1,4 +1,4 @@
-package com.restaurante.pedidos.model;
+package com.example.SistemaDePedidos.model;
 
 public enum Categoria {
     ENTRADA,

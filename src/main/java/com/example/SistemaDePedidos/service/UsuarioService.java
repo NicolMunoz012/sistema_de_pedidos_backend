@@ -1,9 +1,11 @@
-package com.restaurante.pedidos.service;
+package com.example.SistemaDePedidos.service;
 
-import com.restaurante.pedidos.model.Usuario;
-import com.restaurante.pedidos.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.example.SistemaDePedidos.model.RolUsuario;
+import com.example.SistemaDePedidos.model.Usuario;
+import com.example.SistemaDePedidos.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
@@ -13,6 +15,10 @@ public class UsuarioService {
     public Usuario crearUsuario(Usuario usuario) {
         if (!verificarEmailExiste(usuario.getGmail())) {
             usuario.setContraseña(encriptarContraseña(usuario.getContraseña()));
+            // Si no se especifica un rol, asignar CLIENTE por defecto
+            if (usuario.getRol() == null) {
+                usuario.setRol(RolUsuario.CLIENTE);
+            }
             return usuarioRepository.save(usuario);
         }
         return null;
@@ -31,19 +37,22 @@ public class UsuarioService {
     }
 
     public boolean validarCredenciales(String gmail, String contraseña) {
-        Usuario usuario = usuarioRepository.findByGmail(gmail);
+        Usuario usuario = usuarioRepository.findByGmail(gmail)
+                                     .orElse(null);
         return usuario != null && usuario.getContraseña().equals(encriptarContraseña(contraseña));
     }
 
     public Usuario autenticarUsuario(String gmail, String contraseña) {
         if (validarCredenciales(gmail, contraseña)) {
-            return usuarioRepository.findByGmail(gmail);
+            return usuarioRepository.findByGmail(gmail)
+                                            .orElse(null);
         }
         return null;
     }
 
     public void recuperarContraseña(String gmail) {
-        Usuario usuario = usuarioRepository.findByGmail(gmail);
+        Usuario usuario = usuarioRepository.findByGmail(gmail)
+                                     .orElse(null);
         if (usuario != null) {
             System.out.println("Enviando correo de recuperación a: " + gmail);
         }

@@ -1,4 +1,4 @@
-package com.restaurante.pedidos.model;
+package com.example.SistemaDePedidos.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

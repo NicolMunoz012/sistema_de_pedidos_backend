@@ -1,4 +1,4 @@
-package com.restaurante.pedidos.service;
+package com.example.SistemaDePedidos.service;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,21 +8,16 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.restaurante.pedidos.model.DetallePedido;
-import com.restaurante.pedidos.model.Estado;
-import com.restaurante.pedidos.model.Item;
-import com.restaurante.pedidos.model.Pedido;
-import com.restaurante.pedidos.repository.ItemRepository;
-import com.restaurante.pedidos.repository.PedidoRepository;
+import com.example.SistemaDePedidos.model.DetallePedido;
+import com.example.SistemaDePedidos.model.Estado;
+import com.example.SistemaDePedidos.model.Item;
+import com.example.SistemaDePedidos.model.Pedido;
+import com.example.SistemaDePedidos.repository.PedidoRepository;
 
 @Service
 public class PedidoService {
     @Autowired
     private PedidoRepository pedidoRepository;
-    @Autowired
-    private DetallePedidoService detallePedidoService;
-    @Autowired
-    private ItemRepository itemRepository;
     @Autowired
     private NotificacionService notificacionService;
 
@@ -76,7 +71,14 @@ public class PedidoService {
     public Pedido agregarItemAlPedido(int codigoPedido, Item item) {
         Pedido pedido = obtenerPedido(codigoPedido);
         if (pedido != null && item.isDisponibilidad()) {
-            DetallePedido detalle = detallePedidoService.crearDetalle(item, 1);
+            DetallePedido detalle = new DetallePedido();
+            detalle.setIdDetalle(generarIdDetalle(pedido));
+            detalle.setItem(item);
+            detalle.setCantidad(1);
+            detalle.setPrecioUnitario(item.getPrecio());
+            detalle.setSubtotal(item.getPrecio());
+            detalle.setObservaciones("");
+            
             if (pedido.getDetalles() == null) {
                 pedido.setDetalles(new ArrayList<>());
             }
@@ -84,6 +86,16 @@ public class PedidoService {
             return pedidoRepository.save(pedido);
         }
         return null;
+    }
+    
+    private int generarIdDetalle(Pedido pedido) {
+        if (pedido.getDetalles() == null || pedido.getDetalles().isEmpty()) {
+            return 1;
+        }
+        return pedido.getDetalles().stream()
+                .mapToInt(DetallePedido::getIdDetalle)
+                .max()
+                .orElse(0) + 1;
     }
 
     public Pedido eliminarItemDelPedido(int codigoPedido, String nombreItem) {

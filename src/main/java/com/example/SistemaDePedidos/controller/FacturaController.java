@@ -1,4 +1,4 @@
-package com.restaurante.pedidos.controller;
+package com.example.SistemaDePedidos.controller;
 
 import java.util.Date;
 import java.util.List;
@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.restaurante.pedidos.model.Factura;
-import com.restaurante.pedidos.model.Pedido;
-import com.restaurante.pedidos.service.FacturaService;
-import com.restaurante.pedidos.service.PedidoService;
+import com.example.SistemaDePedidos.model.Factura;
+import com.example.SistemaDePedidos.model.Pedido;
+import com.example.SistemaDePedidos.service.FacturaService;
+import com.example.SistemaDePedidos.service.PedidoService;
 
 @RestController
 @RequestMapping("/api/facturas")

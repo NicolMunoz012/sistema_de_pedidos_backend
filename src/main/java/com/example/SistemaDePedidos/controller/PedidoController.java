@@ -1,5 +1,4 @@
-package com.restaurante.pedidos.controller;
-
+package com.example.SistemaDePedidos.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.restaurante.pedidos.model.Estado;
-import com.restaurante.pedidos.model.Item;
-import com.restaurante.pedidos.model.Pedido;
-import com.restaurante.pedidos.service.PedidoService;
+import com.example.SistemaDePedidos.model.Estado;
+import com.example.SistemaDePedidos.model.Item;
+import com.example.SistemaDePedidos.model.Pedido;
+import com.example.SistemaDePedidos.service.PedidoService;
 
 @RestController
 @RequestMapping("/api/pedidos")
