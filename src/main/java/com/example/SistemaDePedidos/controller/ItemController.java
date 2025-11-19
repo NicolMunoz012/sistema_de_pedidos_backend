@@ -3,6 +3,8 @@ package com.example.SistemaDePedidos.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,8 +26,9 @@ public class ItemController {
     private ItemService itemService;
 
     @PostMapping
-    public Item crearItem(@RequestBody Item item) {
-        return itemService.crearItem(item);
+    public ResponseEntity<Item> crearItem(@RequestBody Item item) {
+        Item newItem = itemService.crearItem(item);
+        return new ResponseEntity<>(newItem, HttpStatus.CREATED);
     }
 
     @GetMapping("/{idItem}")
