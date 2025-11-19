@@ -1,13 +1,14 @@
 package com.example.SistemaDePedidos.model;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.util.Date;
 
 @Document(collection = "facturas")
 public class Factura {
     @Id
-    private int codigoFactura;
+    private String codigoFactura;
     private Date fechaEmision;
     private double montoTotal;
     private String metodoPago;
@@ -15,18 +16,18 @@ public class Factura {
     public Factura() {
     }
 
-    public Factura(int codigoFactura, Date fechaEmision, double montoTotal, String metodoPago) {
+    public Factura(String codigoFactura, Date fechaEmision, double montoTotal, String metodoPago) {
         this.codigoFactura = codigoFactura;
         this.fechaEmision = fechaEmision;
         this.montoTotal = montoTotal;
         this.metodoPago = metodoPago;
     }
 
-    public int getCodigoFactura() {
+    public String getCodigoFactura() {
         return codigoFactura;
     }
 
-    public void setCodigoFactura(int codigoFactura) {
+    public void setCodigoFactura(String codigoFactura) {
         this.codigoFactura = codigoFactura;
     }
 

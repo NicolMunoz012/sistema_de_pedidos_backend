@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.example.SistemaDePedidos.model.Factura;
 
 @Repository
-public interface FacturaRepository extends MongoRepository<Factura, Integer> {
+public interface FacturaRepository extends MongoRepository<Factura, String> {
     
     List<Factura> findByFechaEmisionBetween(Date fechaInicio, Date fechaFin);
 }

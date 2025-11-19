@@ -25,13 +25,13 @@ public class FacturaController {
     private PedidoService pedidoService;
 
     @PostMapping("/generar/{codigoPedido}")
-    public Factura generarFactura(@PathVariable int codigoPedido) {
+    public Factura generarFactura(@PathVariable String codigoPedido) {
         Pedido pedido = pedidoService.obtenerPedido(codigoPedido);
         return pedido != null ? facturaService.generarFactura(pedido) : null;
     }
 
     @GetMapping("/{codigoFactura}")
-    public Factura obtenerFactura(@PathVariable int codigoFactura) {
+    public Factura obtenerFactura(@PathVariable String codigoFactura) {
         return facturaService.obtenerFactura(codigoFactura);
     }
 
@@ -51,7 +51,7 @@ public class FacturaController {
     }
 
     @GetMapping("/{codigoFactura}/detalle")
-    public Factura obtenerDetalleFactura(@PathVariable int codigoFactura) {
+    public Factura obtenerDetalleFactura(@PathVariable String codigoFactura) {
         return facturaService.obtenerFactura(codigoFactura);
     }
 }
