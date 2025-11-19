@@ -30,21 +30,9 @@ public class PedidoService {
         // Rellenar datos completos del Cliente
         if (pedido.getCliente() != null && pedido.getCliente().getIdUsuario() != null) {
             String idCliente = pedido.getCliente().getIdUsuario();
-            // Obtener el objeto como tipo base Usuario
             com.example.SistemaDePedidos.model.Usuario usuarioBase = usuarioService.obtenerUsuario(idCliente);
-            
-            // 1. Verificar si existe
-            if (usuarioBase == null) {
-                throw new RuntimeException("Cliente (Usuario) no encontrado con ID: " + idCliente);
-            }
-            
-            // 2. Verificar si es del tipo correcto (Cliente) antes de asignar
-            if (usuarioBase instanceof Cliente) {
-                // El casting ahora es seguro porque sabemos que la instancia real es un Cliente
+            if (usuarioBase != null) {
                 pedido.setCliente((Cliente) usuarioBase);
-            } else {
-                // Lanza una excepción si el ID existe, pero no es de la subclase esperada
-                throw new RuntimeException("El usuario con ID " + idCliente + " no es de tipo Cliente.");
             }
         }
         
@@ -54,13 +42,12 @@ public class PedidoService {
                 if (detalle.getItem() != null && detalle.getItem().getIdItem() != null) {
                     String idItem = detalle.getItem().getIdItem();
                     Item itemCompleto = itemService.obtenerItem(idItem);
-                    if (itemCompleto == null) {
-                        throw new RuntimeException("Item no encontrado con ID: " + idItem);
+                    if (itemCompleto != null) {
+                        detalle.setItem(itemCompleto);
+                        // Calcular precio unitario y subtotal basado en el item completo
+                        detalle.setPrecioUnitario(itemCompleto.getPrecio());
+                        detalle.setSubtotal(itemCompleto.getPrecio() * detalle.getCantidad());
                     }
-                    detalle.setItem(itemCompleto);
-                    // Calcular precio unitario y subtotal basado en el item completo
-                    detalle.setPrecioUnitario(itemCompleto.getPrecio());
-                    detalle.setSubtotal(itemCompleto.getPrecio() * detalle.getCantidad());
                 }
             }
         }
