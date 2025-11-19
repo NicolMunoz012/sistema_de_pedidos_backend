@@ -30,9 +30,9 @@ public class PedidoService {
         // Rellenar datos completos del Cliente
         if (pedido.getCliente() != null && pedido.getCliente().getIdUsuario() != null) {
             String idCliente = pedido.getCliente().getIdUsuario();
-            Object clienteCompleto = usuarioService.obtenerUsuario(idCliente);
-            if (clienteCompleto instanceof com.example.SistemaDePedidos.model.Cliente) {
-                pedido.setCliente((com.example.SistemaDePedidos.model.Cliente) clienteCompleto);
+            Cliente clienteCompleto = (Cliente) usuarioService.obtenerUsuario(idCliente);
+            if (clienteCompleto != null) {
+                pedido.setCliente(clienteCompleto);
             }
         }
         
