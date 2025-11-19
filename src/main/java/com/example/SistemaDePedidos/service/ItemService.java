@@ -19,20 +19,27 @@ public class ItemService {
         return itemRepository.save(item);
     }
     
-    public Item obtenerItem(String nombre) {
+    public Item obtenerItem(String idItem) {
+        return itemRepository.findById(idItem)
+                .orElse(null);
+    }
+    
+    public Item obtenerItemPorNombre(String nombre) {
         return itemRepository.findByNombre(nombre)
                 .orElse(null);
     }
     
-    public Item actualizarItem(Item item) {
-        return itemRepository.save(item); 
+    public Item actualizarItem(String idItem, Item item) {
+        Item itemExistente = obtenerItem(idItem);
+        if (itemExistente != null) {
+            item.setIdItem(idItem);
+            return itemRepository.save(item);
+        }
+        return null;
     }
     
-    public void eliminarItem(String nombre) {
-        Item item = obtenerItem(nombre);
-        if (item != null) {
-            itemRepository.delete(item);
-        }
+    public void eliminarItem(String idItem) {
+        itemRepository.deleteById(idItem);
     }
     
     public List<Item> listarTodosLosItems() {
@@ -47,8 +54,8 @@ public class ItemService {
         return itemRepository.findByDisponibilidad(true); 
     }
     
-    public void cambiarDisponibilidad(String nombre, boolean disponible) {
-        Item item = obtenerItem(nombre);
+    public void cambiarDisponibilidad(String idItem, boolean disponible) {
+        Item item = obtenerItem(idItem);
         if (item != null) {
             item.setDisponibilidad(disponible);
             itemRepository.save(item);

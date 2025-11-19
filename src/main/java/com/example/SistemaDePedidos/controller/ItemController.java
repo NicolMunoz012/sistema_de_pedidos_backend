@@ -28,9 +28,9 @@ public class ItemController {
         return itemService.crearItem(item);
     }
 
-    @GetMapping("/{nombre}")
-    public Item obtenerItem(@PathVariable String nombre) {
-        return itemService.obtenerItem(nombre);
+    @GetMapping("/{idItem}")
+    public Item obtenerItem(@PathVariable String idItem) {
+        return itemService.obtenerItem(idItem);
     }
 
     @GetMapping
@@ -43,20 +43,19 @@ public class ItemController {
         return itemService.listarItemsPorCategoria(categoria);
     }
 
-    @PutMapping("/{nombre}")
-    public Item actualizarItem(@PathVariable String nombre, @RequestBody Item item) {
-        item.setNombre(nombre);
-        return itemService.actualizarItem(item);
+    @PutMapping("/{idItem}")
+    public Item actualizarItem(@PathVariable String idItem, @RequestBody Item item) {
+        return itemService.actualizarItem(idItem, item);
     }
 
-    @DeleteMapping("/{nombre}")
-    public void eliminarItem(@PathVariable String nombre) {
-        itemService.eliminarItem(nombre);
+    @DeleteMapping("/{idItem}")
+    public void eliminarItem(@PathVariable String idItem) {
+        itemService.eliminarItem(idItem);
     }
 
-    @PutMapping("/{nombre}/disponibilidad")
-    public void cambiarDisponibilidad(@PathVariable String nombre, @RequestParam boolean disponible) {
-        itemService.cambiarDisponibilidad(nombre, disponible);
+    @PutMapping("/{idItem}/disponibilidad")
+    public void cambiarDisponibilidad(@PathVariable String idItem, @RequestParam boolean disponible) {
+        itemService.cambiarDisponibilidad(idItem, disponible);
     }
 
     @GetMapping("/buscar")

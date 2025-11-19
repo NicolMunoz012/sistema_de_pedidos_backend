@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "items")
 public class Item {
     @Id
+    private String idItem;
     private String nombre;
     private Categoria categoria;
     private String descripcion;
@@ -21,6 +22,14 @@ public class Item {
         this.descripcion = descripcion;
         this.precio = precio;
         this.disponibilidad = disponibilidad;
+    }
+
+    public String getIdItem() {
+        return idItem;
+    }
+
+    public void setIdItem(String idItem) {
+        this.idItem = idItem;
     }
 
     public String getNombre() {
@@ -66,7 +75,8 @@ public class Item {
     @Override
     public String toString() {
         return "Item{" +
-                "nombre='" + nombre + '\'' +
+                "idItem='" + idItem + '\'' +
+                ", nombre='" + nombre + '\'' +
                 ", categoria=" + categoria +
                 ", descripcion='" + descripcion + '\'' +
                 ", precio=" + precio +
