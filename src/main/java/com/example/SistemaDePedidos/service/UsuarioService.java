@@ -13,15 +13,14 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
 
     public Usuario crearUsuario(Usuario usuario) {
-        if (!verificarEmailExiste(usuario.getGmail())) {
-            usuario.setContraseña(encriptarContraseña(usuario.getContraseña()));
-            // Si no se especifica un rol, asignar CLIENTE por defecto
-            if (usuario.getRol() == null) {
-                usuario.setRol(RolUsuario.CLIENTE);
-            }
-            return usuarioRepository.save(usuario);
+    if (!verificarEmailExiste(usuario.getGmail())) {
+        usuario.setContraseña(encriptarContraseña(usuario.getContraseña()));
+        if (usuario.getRol() == null) {
+            usuario.setRol(RolUsuario.CLIENTE);
         }
-        return null;
+        return usuarioRepository.save(usuario);
+}
+    throw new RuntimeException("El email " + usuario.getGmail() + " ya está registrado."); 
     }
 
     public Usuario obtenerUsuario(String idUsuario) {
