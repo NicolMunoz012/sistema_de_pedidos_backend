@@ -31,9 +31,10 @@ public class PedidoService {
         if (pedido.getCliente() != null && pedido.getCliente().getIdUsuario() != null) {
             String idCliente = pedido.getCliente().getIdUsuario();
             Cliente clienteCompleto = (Cliente) usuarioService.obtenerUsuario(idCliente);
-            if (clienteCompleto != null) {
-                pedido.setCliente(clienteCompleto);
+            if (clienteCompleto == null) {
+                throw new RuntimeException("Cliente no encontrado con ID: " + idCliente);
             }
+            pedido.setCliente(clienteCompleto);
         }
         
         // Rellenar datos completos de los Items en los detalles
@@ -42,12 +43,13 @@ public class PedidoService {
                 if (detalle.getItem() != null && detalle.getItem().getIdItem() != null) {
                     String idItem = detalle.getItem().getIdItem();
                     Item itemCompleto = itemService.obtenerItem(idItem);
-                    if (itemCompleto != null) {
-                        detalle.setItem(itemCompleto);
-                        // Calcular precio unitario y subtotal basado en el item completo
-                        detalle.setPrecioUnitario(itemCompleto.getPrecio());
-                        detalle.setSubtotal(itemCompleto.getPrecio() * detalle.getCantidad());
+                    if (itemCompleto == null) {
+                        throw new RuntimeException("Item no encontrado con ID: " + idItem);
                     }
+                    detalle.setItem(itemCompleto);
+                    // Calcular precio unitario y subtotal basado en el item completo
+                    detalle.setPrecioUnitario(itemCompleto.getPrecio());
+                    detalle.setSubtotal(itemCompleto.getPrecio() * detalle.getCantidad());
                 }
             }
         }
