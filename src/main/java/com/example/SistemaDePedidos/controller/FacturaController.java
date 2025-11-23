@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,15 +41,18 @@ public class FacturaController {
         return facturaService.listarTodasLasFacturas();
     }
 
-    @GetMapping("/cliente/{idCliente}")
-    public List<Factura> listarFacturasPorCliente(@PathVariable String idCliente) {
-        return facturaService.listarFacturasPorCliente(idCliente);
+    @GetMapping("/usuario/{idUsuario}")
+    public List<Factura> listarFacturasPorUsuario(@PathVariable String idUsuario) {
+        return facturaService.listarFacturasPorUsuario(idUsuario);
     }
 
-    @GetMapping("/rango")
-    public List<Factura> listarFacturasPorFecha(@RequestParam Date fechaInicio, @RequestParam Date fechaFin) {
-        return facturaService.listarFacturasPorRangoFechas(fechaInicio, fechaFin);
-    }
+@GetMapping("/rango")
+public List<Factura> listarFacturasPorFecha(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fechaInicio,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fechaFin) {
+
+    return facturaService.listarFacturasPorRangoFechas(fechaInicio, fechaFin);
+}
 
     @GetMapping("/{codigoFactura}/detalle")
     public Factura obtenerDetalleFactura(@PathVariable String codigoFactura) {

@@ -24,7 +24,7 @@ public class FacturaService {
         factura.setMontoTotal(calcularMontoTotal(pedido));
         factura.setMetodoPago("Efectivo");
         Factura nuevaFactura = facturaRepository.save(factura);
-        notificacionService.enviarNotificacionFacturaGenerada(nuevaFactura, pedido.getCliente());
+        notificacionService.enviarNotificacionFacturaGenerada(nuevaFactura, pedido.getIdUsuario());
         return nuevaFactura;
     }
 
@@ -36,7 +36,7 @@ public class FacturaService {
         return facturaRepository.findAll();
     }
 
-    public List<Factura> listarFacturasPorCliente(String idCliente) {
+    public List<Factura> listarFacturasPorUsuario(String idUsuario) {
         return facturaRepository.findAll();
     }
 

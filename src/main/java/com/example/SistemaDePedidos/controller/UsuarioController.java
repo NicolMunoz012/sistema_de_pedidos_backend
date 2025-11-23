@@ -38,8 +38,9 @@ public class UsuarioController {
     }
 
     @PostMapping("/logout/{idUsuario}")
-    public void cerrarSesion(@PathVariable String idUsuario) {
-        System.out.println("Usuario " + idUsuario + " cerró sesión");
+    public ResponseEntity<String> cerrarSesion(@PathVariable String idUsuario) {
+    System.out.println("Usuario " + idUsuario + " cerró sesión");
+    return ResponseEntity.ok("Sesión cerrada para el usuario " + idUsuario);
     }
 
     @PostMapping("/recuperar")

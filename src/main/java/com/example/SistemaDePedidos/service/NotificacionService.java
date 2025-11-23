@@ -1,27 +1,41 @@
 package com.example.SistemaDePedidos.service;
 
-import com.example.SistemaDePedidos.model.Cliente;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.example.SistemaDePedidos.model.Estado;
 import com.example.SistemaDePedidos.model.Factura;
 import com.example.SistemaDePedidos.model.Pedido;
-import org.springframework.stereotype.Service;
+import com.example.SistemaDePedidos.model.Usuario;
 
 @Service
 public class NotificacionService {
+    
+    @Autowired
+    private UsuarioService usuarioService;
 
-    public void enviarNotificacionPedidoCreado(Pedido pedido, Cliente cliente) {
-        String mensaje = generarMensajePedido(pedido);
-        enviarCorreo(cliente.getGmail(), "Pedido Creado", mensaje);
+    public void enviarNotificacionPedidoCreado(Pedido pedido, String idUsuario) {
+        Usuario usuario = usuarioService.obtenerUsuario(idUsuario);
+        if (usuario != null) {
+            String mensaje = generarMensajePedido(pedido);
+            enviarCorreo(usuario.getGmail(), "Pedido Creado", mensaje);
+        }
     }
 
     public void enviarNotificacionCambioEstado(Pedido pedido, Estado nuevoEstado) {
-        String mensaje = "Su pedido #" + pedido.getCodigoPedido() + " cambió a estado: " + nuevoEstado;
-        enviarCorreo(pedido.getCliente().getGmail(), "Cambio de Estado", mensaje);
+        Usuario usuario = usuarioService.obtenerUsuario(pedido.getIdUsuario());
+        if (usuario != null) {
+            String mensaje = "Su pedido #" + pedido.getCodigoPedido() + " cambió a estado: " + nuevoEstado;
+            enviarCorreo(usuario.getGmail(), "Cambio de Estado", mensaje);
+        }
     }
 
-    public void enviarNotificacionFacturaGenerada(Factura factura, Cliente cliente) {
-        String mensaje = generarMensajeFactura(factura);
-        enviarCorreo(cliente.getGmail(), "Factura Generada", mensaje);
+    public void enviarNotificacionFacturaGenerada(Factura factura, String idUsuario) {
+        Usuario usuario = usuarioService.obtenerUsuario(idUsuario);
+        if (usuario != null) {
+            String mensaje = generarMensajeFactura(factura);
+            enviarCorreo(usuario.getGmail(), "Factura Generada", mensaje);
+        }
     }
 
     public void enviarCorreo(String destinatario, String asunto, String cuerpo) {

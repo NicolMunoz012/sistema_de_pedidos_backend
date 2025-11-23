@@ -12,7 +12,7 @@ import com.example.SistemaDePedidos.model.Pedido;
 @Repository
 public interface PedidoRepository extends MongoRepository<Pedido, String> {
     
-    List<Pedido> findByCliente_IdUsuario(String idUsuario);
+    List<Pedido> findByIdUsuario(String idUsuario);
     
     List<Pedido> findByEstado(Estado estado);
     

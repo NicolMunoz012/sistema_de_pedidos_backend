@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.SistemaDePedidos.model.Cliente;
 import com.example.SistemaDePedidos.model.DetallePedido;
 import com.example.SistemaDePedidos.model.Estado;
 import com.example.SistemaDePedidos.model.Item;
 import com.example.SistemaDePedidos.model.Pedido;
+import com.example.SistemaDePedidos.model.Usuario;
 import com.example.SistemaDePedidos.repository.PedidoRepository;
 
 @Service
@@ -26,30 +26,22 @@ public class PedidoService {
     @Autowired
     private ItemService itemService;
 
+    /**
+     * Crea un nuevo pedido congelando los precios de los items al momento de la creación.
+     * Los detalles son documentos embebidos (composición fuerte).
+     */
     public Pedido crearPedido(Pedido pedido) {
-        // Lógica de inyección del Cliente
-        if (pedido.getCliente() != null && pedido.getCliente().getIdUsuario() != null) {
-            String idCliente = pedido.getCliente().getIdUsuario();
-            // Obtener el objeto como tipo base Usuario
-            com.example.SistemaDePedidos.model.Usuario usuarioBase = usuarioService.obtenerUsuario(idCliente);
-            
-            // 1. Verificar si existe
-            if (usuarioBase == null) {
-                throw new RuntimeException("Cliente (Usuario) no encontrado con ID: " + idCliente);
-            }
-            
-            // 2. Verificar si es del tipo correcto antes de asignar
-            if (usuarioBase instanceof Cliente) {
-                // El casting ahora es seguro
-                pedido.setCliente((Cliente) usuarioBase);
-            } else {
-                // El ID existe, pero no es de la subclase esperada
-                throw new RuntimeException("El usuario con ID " + idCliente + " no es de tipo Cliente.");
+        // Verificar que el usuario existe
+        if (pedido.getIdUsuario() != null) {
+            Usuario usuario = usuarioService.obtenerUsuario(pedido.getIdUsuario());
+            if (usuario == null) {
+                throw new RuntimeException("Usuario no encontrado con ID: " + pedido.getIdUsuario());
             }
         }
         
-        // Rellenar datos completos de los Items en los detalles
+        // ✅ Rellenar datos completos de los Items y congelar precios
         if (pedido.getDetalles() != null && !pedido.getDetalles().isEmpty()) {
+            int detalleIndex = 1;
             for (DetallePedido detalle : pedido.getDetalles()) {
                 if (detalle.getItem() != null && detalle.getItem().getIdItem() != null) {
                     String idItem = detalle.getItem().getIdItem();
@@ -57,9 +49,20 @@ public class PedidoService {
                     if (itemCompleto == null) {
                         throw new RuntimeException("Item no encontrado con ID: " + idItem);
                     }
+                    
+                    // ✅ Asignar item completo
                     detalle.setItem(itemCompleto);
+                    
+                    // ✅ Generar ID del detalle si no existe
+                    if (detalle.getIdDetalle() == null || detalle.getIdDetalle().isEmpty()) {
+                        detalle.setIdDetalle(String.valueOf(detalleIndex++));
+                    }
+                    
+                    // ✅ Congelar precio unitario del item en este momento
                     detalle.setPrecioUnitario(itemCompleto.getPrecio());
-                    detalle.setSubtotal(itemCompleto.getPrecio() * detalle.getCantidad());
+                    
+                    // ✅ Calcular subtotal automáticamente
+                    detalle.calcularSubtotal();
                 }
             }
         }
@@ -67,7 +70,7 @@ public class PedidoService {
         pedido.setFecha(new Date());
         pedido.setEstado(Estado.PENDIENTE);
         Pedido nuevoPedido = pedidoRepository.save(pedido);
-        notificacionService.enviarNotificacionPedidoCreado(nuevoPedido, pedido.getCliente());
+        notificacionService.enviarNotificacionPedidoCreado(nuevoPedido, pedido.getIdUsuario());
         return nuevoPedido;
     }
 
@@ -87,9 +90,9 @@ public class PedidoService {
         return pedidoRepository.findAll();
     }
 
-    public List<Pedido> listarPedidosPorCliente(String idCliente) {
+    public List<Pedido> listarPedidosPorUsuario(String idUsuario) {
         return pedidoRepository.findAll().stream()
-                .filter(p -> p.getCliente() != null && p.getCliente().getIdUsuario().equals(idCliente))
+                .filter(p -> p.getIdUsuario() != null && p.getIdUsuario().equals(idUsuario))
                 .collect(Collectors.toList());
     }
 
@@ -110,24 +113,63 @@ public class PedidoService {
         return null;
     }
 
-    public Pedido agregarItemAlPedido(String codigoPedido, Item item) {
+    /**
+     * Agrega un item existente al pedido creando un nuevo DetallePedido.
+     * El precio se congela al momento de agregar el item.
+     * 
+     * Flujo:
+     * 1. Buscar el Pedido por codigoPedido
+     * 2. Buscar el Item por idItem
+     * 3. Crear un nuevo DetallePedido con ese item
+     * 4. Setear precioUnitario = item.getPrecio() (congelado)
+     * 5. Setear subtotal = cantidad * precioUnitario
+     * 6. Agregar el detalle al Pedido
+     * 7. Guardar el Pedido completo
+     */
+    public Pedido agregarItemAlPedido(String codigoPedido, String idItem, int cantidad, String observaciones) {
+        // 1. Buscar el Pedido
         Pedido pedido = obtenerPedido(codigoPedido);
-        if (pedido != null && item.isDisponibilidad()) {
-            DetallePedido detalle = new DetallePedido();
-            detalle.setIdDetalle(generarIdDetalle(pedido));
-            detalle.setItem(item);
-            detalle.setCantidad(1);
-            detalle.setPrecioUnitario(item.getPrecio());
-            detalle.setSubtotal(item.getPrecio());
-            detalle.setObservaciones("");
-            
-            if (pedido.getDetalles() == null) {
-                pedido.setDetalles(new ArrayList<>());
-            }
-            pedido.getDetalles().add(detalle);
-            return pedidoRepository.save(pedido);
+        if (pedido == null) {
+            throw new RuntimeException("Pedido no encontrado con código: " + codigoPedido);
         }
-        return null;
+        
+        // 2. Buscar el Item
+        Item item = itemService.obtenerItem(idItem);
+        if (item == null) {
+            throw new RuntimeException("Item no encontrado con ID: " + idItem);
+        }
+        
+        // Validar que el item esté disponible
+        if (!item.isDisponibilidad()) {
+            throw new RuntimeException("El item '" + item.getNombre() + "' no está disponible");
+        }
+        
+        // Validar cantidad
+        if (cantidad <= 0) {
+            throw new RuntimeException("La cantidad debe ser mayor a 0");
+        }
+        
+        // 3. Crear un nuevo DetallePedido
+        // ✅ El constructor congela el precio automáticamente
+        DetallePedido detalle = new DetallePedido(
+            generarIdDetalle(pedido),
+            item,
+            cantidad,
+            observaciones
+        );
+        
+        // 4-5. El precio y subtotal ya se setean en el constructor
+        // precioUnitario = item.getPrecio() (congelado)
+        // subtotal = cantidad * precioUnitario
+        
+        // 6. Agregar el detalle al Pedido
+        if (pedido.getDetalles() == null) {
+            pedido.setDetalles(new ArrayList<>());
+        }
+        pedido.getDetalles().add(detalle);
+        
+        // 7. Guardar el Pedido completo
+        return pedidoRepository.save(pedido);
     }
     
     private String generarIdDetalle(Pedido pedido) {
@@ -143,13 +185,55 @@ public class PedidoService {
         return String.valueOf(maxId + 1);
     }
 
-    public Pedido eliminarItemDelPedido(String codigoPedido, String nombreItem) {
+    /**
+     * Elimina un detalle del pedido por su ID.
+     */
+    public Pedido eliminarItemDelPedido(String codigoPedido, String idDetalle) {
         Pedido pedido = obtenerPedido(codigoPedido);
-        if (pedido != null && pedido.getDetalles() != null) {
-            pedido.getDetalles().removeIf(d -> d.getItem().getNombre().equals(nombreItem));
+        if (pedido == null) {
+            throw new RuntimeException("Pedido no encontrado con código: " + codigoPedido);
+        }
+        
+        if (pedido.getDetalles() != null) {
+            boolean eliminado = pedido.getDetalles().removeIf(d -> d.getIdDetalle().equals(idDetalle));
+            if (!eliminado) {
+                throw new RuntimeException("Detalle no encontrado con ID: " + idDetalle);
+            }
             return pedidoRepository.save(pedido);
         }
-        return null;
+        return pedido;
+    }
+    
+    /**
+     * Actualiza la cantidad de un detalle existente.
+     * El subtotal se recalcula automáticamente.
+     */
+    public Pedido actualizarCantidadDetalle(String codigoPedido, String idDetalle, int cantidad) {
+        Pedido pedido = obtenerPedido(codigoPedido);
+        if (pedido == null) {
+            throw new RuntimeException("Pedido no encontrado con código: " + codigoPedido);
+        }
+        
+        if (cantidad <= 0) {
+            throw new RuntimeException("La cantidad debe ser mayor a 0");
+        }
+        
+        if (pedido.getDetalles() != null) {
+            DetallePedido detalle = pedido.getDetalles().stream()
+                .filter(d -> d.getIdDetalle().equals(idDetalle))
+                .findFirst()
+                .orElse(null);
+            
+            if (detalle == null) {
+                throw new RuntimeException("Detalle no encontrado con ID: " + idDetalle);
+            }
+            
+            // ✅ Al cambiar la cantidad, el subtotal se recalcula automáticamente
+            detalle.setCantidad(cantidad);
+            
+            return pedidoRepository.save(pedido);
+        }
+        return pedido;
     }
 
     public double calcularTotalPedido(Pedido pedido) {

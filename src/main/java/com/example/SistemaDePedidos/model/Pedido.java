@@ -5,14 +5,12 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "pedidos")
 public class Pedido {
     @Id
-    @Field("_id")
     private String codigoPedido;
-    private Cliente cliente;
+    private String idUsuario;
     private Date fecha;
     private Estado estado;
     private List<DetallePedido> detalles;
@@ -20,9 +18,9 @@ public class Pedido {
     public Pedido() {
     }
 
-    public Pedido(String codigoPedido, Cliente cliente, Date fecha, Estado estado, List<DetallePedido> detalles) {
+    public Pedido(String codigoPedido, String idUsuario, Date fecha, Estado estado, List<DetallePedido> detalles) {
         this.codigoPedido = codigoPedido;
-        this.cliente = cliente;
+        this.idUsuario = idUsuario;
         this.fecha = fecha;
         this.estado = estado;
         this.detalles = detalles;
@@ -36,12 +34,12 @@ public class Pedido {
         this.codigoPedido = codigoPedido;
     }
 
-    public Cliente getCliente() {
-        return cliente;
+    public String getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
+    public void setIdUsuario(String idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public Date getFecha() {
@@ -72,7 +70,7 @@ public class Pedido {
     public String toString() {
         return "Pedido{" +
                 "codigoPedido=" + codigoPedido +
-                ", cliente=" + cliente +
+                ", idUsuario='" + idUsuario + '\'' +
                 ", fecha=" + fecha +
                 ", estado=" + estado +
                 ", detalles=" + detalles +

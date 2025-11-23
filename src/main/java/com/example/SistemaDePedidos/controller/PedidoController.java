@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.SistemaDePedidos.model.Estado;
-import com.example.SistemaDePedidos.model.Item;
 import com.example.SistemaDePedidos.model.Pedido;
 import com.example.SistemaDePedidos.service.PedidoService;
 
@@ -28,24 +27,30 @@ public class PedidoController {
         return pedidoService.crearPedido(pedido);
     }
 
+    @GetMapping("/todos")
+    public List<Pedido> listarTodosLosPedidos() {
+        return pedidoService.listarTodosLosPedidos();
+    }
+
+    @GetMapping("/por-usuario/{idUsuario}")
+    public List<Pedido> listarPedidosPorUsuario(@PathVariable String idUsuario) {
+        return pedidoService.listarPedidosPorUsuario(idUsuario);
+    }
+
+    @GetMapping("/por-estado/{estado}")
+    public List<Pedido> listarPedidosPorEstado(@PathVariable Estado estado) {
+        return pedidoService.listarPedidosPorEstado(estado);
+    }
+
     @GetMapping("/{codigoPedido}")
     public Pedido obtenerPedido(@PathVariable String codigoPedido) {
         return pedidoService.obtenerPedido(codigoPedido);
     }
 
-    @GetMapping
-    public List<Pedido> listarTodosLosPedidos() {
-        return pedidoService.listarTodosLosPedidos();
-    }
-
-    @GetMapping("/cliente/{idCliente}")
-    public List<Pedido> listarPedidosPorCliente(@PathVariable String idCliente) {
-        return pedidoService.listarPedidosPorCliente(idCliente);
-    }
-
-    @GetMapping("/estado/{estado}")
-    public List<Pedido> listarPedidosPorEstado(@PathVariable Estado estado) {
-        return pedidoService.listarPedidosPorEstado(estado);
+    @GetMapping("/{codigoPedido}/total")
+    public double calcularTotalPedido(@PathVariable String codigoPedido) {
+        Pedido pedido = pedidoService.obtenerPedido(codigoPedido);
+        return pedido != null ? pedidoService.calcularTotalPedido(pedido) : 0.0;
     }
 
     @PutMapping("/{codigoPedido}/estado")
@@ -54,19 +59,25 @@ public class PedidoController {
     }
 
     @PostMapping("/{codigoPedido}/items")
-    public Pedido agregarItemAlPedido(@PathVariable String codigoPedido, @RequestBody Item item) {
-        return pedidoService.agregarItemAlPedido(codigoPedido, item);
+    public Pedido agregarItemAlPedido(
+            @PathVariable String codigoPedido,
+            @RequestParam String idItem,
+            @RequestParam(defaultValue = "1") int cantidad,
+            @RequestParam(defaultValue = "") String observaciones) {
+        return pedidoService.agregarItemAlPedido(codigoPedido, idItem, cantidad, observaciones);
     }
 
-    @DeleteMapping("/{codigoPedido}/items/{nombreItem}")
-    public Pedido eliminarItemDelPedido(@PathVariable String codigoPedido, @PathVariable String nombreItem) {
-        return pedidoService.eliminarItemDelPedido(codigoPedido, nombreItem);
+    @DeleteMapping("/{codigoPedido}/items/{idDetalle}")
+    public Pedido eliminarItemDelPedido(@PathVariable String codigoPedido, @PathVariable String idDetalle) {
+        return pedidoService.eliminarItemDelPedido(codigoPedido, idDetalle);
     }
-
-    @GetMapping("/{codigoPedido}/total")
-    public double calcularTotalPedido(@PathVariable String codigoPedido) {
-        Pedido pedido = pedidoService.obtenerPedido(codigoPedido);
-        return pedido != null ? pedidoService.calcularTotalPedido(pedido) : 0.0;
+    
+    @PutMapping("/{codigoPedido}/items/{idDetalle}")
+    public Pedido actualizarCantidadDetalle(
+            @PathVariable String codigoPedido,
+            @PathVariable String idDetalle,
+            @RequestParam int cantidad) {
+        return pedidoService.actualizarCantidadDetalle(codigoPedido, idDetalle, cantidad);
     }
 
     @DeleteMapping("/{codigoPedido}/cancelar")
