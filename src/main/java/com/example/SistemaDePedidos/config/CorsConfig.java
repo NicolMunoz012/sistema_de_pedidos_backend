@@ -11,7 +11,8 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
                 .allowedOrigins(
-                    "https://sistema-de-pedidos-sage.vercel.app",
+                    "https://sistema-de-pedidos-quay.vercel.app/",
+                    "https://sistema-de-pedidos-quay-git-main-nicols-projects-baf675f0.vercel.app/",
                     "https://sistema-de-pedidos-git-main-nicols-projects-baf675f0.vercel.app",
                     "http://localhost:3000", 
                     "http://localhost:5173"
